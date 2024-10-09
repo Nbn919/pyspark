@@ -1,0 +1,67 @@
+Problem Statement
+●	As a data engineer you are given the task to transform the given data
+●	In addition to given metadata, transformed data should have a column named as AvgWeight with constant value as 200 and also kilowatt_power which needs to be 1000 times horsepower.
+●	Column name carr is a mis-spelled column name and you are supposed to correct this to car
+
+Data
+
+Ford Torino, 140, 3449, US
+Chevrolet Monte Carlo, 150, 3761, US
+BMW 2002, 113, 2234, Europe
+
+Metadata- columns
+
+carr - String
+horsepower - Integer
+weight - Integer
+origin - String
+
+
+
+
+from pyspark.sql import SparkSession
+ from pyspark.sql.functions import lit, col
+ data = [("Ford Torino", 140, 3449, "US"),
+        ("Chevrolet Monte Carlo", 150, 3761, "US"),
+         ("BMW 2002", 113, 2234, "Europe")]
+ columns = ["car", "horsepower", "weight", "origin"]
+ columns = ["carr", "horsepower", "weight", "origin"]
+ df = spark.createDataFrame(data, columns)
+ df.show()
++--------------------+----------+------+------+                                 
+|                carr|horsepower|weight|origin|
++--------------------+----------+------+------+
+|         Ford Torino|       140|  3449|    US|
+|Chevrolet Monte C...|       150|  3761|    US|
+|            BMW 2002|       113|  2234|Europe|
++--------------------+----------+------+------+
+
+ df_transformed = df.withColumnRenamed("carr", "car")
+ df_transformed.show()
++--------------------+----------+------+------+
+|                 car|horsepower|weight|origin|
++--------------------+----------+------+------+
+|         Ford Torino|       140|  3449|    US|
+|Chevrolet Monte C...|       150|  3761|    US|
+|            BMW 2002|       113|  2234|Europe|
++--------------------+----------+------+------+
+
+ df_transformed = df_transformed.withColumn("AvgWeight", lit(200))
+ df_transformed.show()
++--------------------+----------+------+------+---------+
+|                 car|horsepower|weight|origin|AvgWeight|
++--------------------+----------+------+------+---------+
+|         Ford Torino|       140|  3449|    US|      200|
+|Chevrolet Monte C...|       150|  3761|    US|      200|
+|            BMW 2002|       113|  2234|Europe|      200|
++--------------------+----------+------+------+---------+
+
+ df_transformed = df_transformed.withColumn("kilowatt_power", col("horsepower") * 1000)
+ df_transformed.show()
++--------------------+----------+------+------+---------+--------------+
+|                 car|horsepower|weight|origin|AvgWeight|kilowatt_power|
++--------------------+----------+------+------+---------+--------------+
+|         Ford Torino|       140|  3449|    US|      200|        140000|
+|Chevrolet Monte C...|       150|  3761|    US|      200|        150000|
+|            BMW 2002|       113|  2234|Europe|      200|        113000|
++--------------------+----------+------+------+---------+--------------+
