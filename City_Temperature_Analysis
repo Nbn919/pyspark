@@ -1,0 +1,81 @@
+
+Problem Statement	
+●	As a data engineer you are supposed to prepare the data from temp analysis
+●	Your pipeline should return data in form of following columns
+		city
+		avg_temperature
+		total_temperature
+		num_measurements
+●	You should return metrics for only those cities when total_temperature is greater than 30
+●	And output should be sorted on city in ascending order
+
+Data
+
+ New York , 10.0  
+ New York , 12.0 
+ Los Angeles , 20.0  
+ Los Angeles , 22.0 
+ San Francisco , 15.0  
+ San Francisco , 18.0
+
+Metadata- columns
+
+city - String
+temperature - Double
+
+
+
+Solution
+
+
+ from pyspark.sql import SparkSession
+ from pyspark.sql.functions import col, avg, sum, count
+ data = [
+     ("New York", 10.0),
+     ("New York", 12.0),
+     ("Los Angeles", 20.0),
+     ("Los Angeles", 22.0),
+     ("San Francisco", 15.0),
+     ("San Francisco", 18.0)
+ ]
+ columns = ["city", "temperature"]
+ df = spark.createDataFrame(data, schema=columns)
+ df.show()
++-------------+-----------+
+|         city|temperature|
++-------------+-----------+
+|     New York|       10.0|
+|     New York|       12.0|
+|  Los Angeles|       20.0|
+|  Los Angeles|       22.0|
+|San Francisco|       15.0|
+|San Francisco|       18.0|
++-------------+-----------+
+
+ df_aggregated = df.groupBy("city") \
+    .agg(
+        sum("temperature").alias("total_temperature"),
+        avg("temperature").alias("avg_temperature"),
+         count("temperature").alias("num_measurements")
+    )
+ df_aggregaated.show()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'df_aggregaated' is not defined. Did you mean: 'df_aggregated'?
+ df_filtered = df_aggregated.filter(col("total_temperature") > 30)
+ df_filtered.show()
++-------------+-----------------+---------------+----------------+
+|         city|total_temperature|avg_temperature|num_measurements|
++-------------+-----------------+---------------+----------------+
+|  Los Angeles|             42.0|           21.0|               2|
+|San Francisco|             33.0|           16.5|               2|
++-------------+-----------------+---------------+----------------+
+
+ df_sorted = df_filtered.orderBy("city")
+df_sorted.show()
++-------------+-----------------+---------------+----------------+
+|         city|total_temperature|avg_temperature|num_measurements|
++-------------+-----------------+---------------+----------------+
+|  Los Angeles|             42.0|           21.0|               2|
+|San Francisco|             33.0|           16.5|               2|
++-------------+-----------------+---------------+----------------+
