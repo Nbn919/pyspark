@@ -1,0 +1,62 @@
+
+Problem Statement
+●	As a data engineer you are given the task to clean the customer data
+●	Your pipeline should remove all the duplicates records
+●	And also remove those records which are duplicated on the basis of height and age
+
+Data
+
+Smith,23,5.3
+Rashmi,27,5.8
+Smith,23,5.3
+Payal,27,5.8
+Megha,27,5.4
+Metadata- columns
+
+Name - String
+Age - Integer
+Height - double
+
+Solution
+
+
+data = [
+     ("Smith", 23, 5.3),
+    ("Rashmi", 27, 5.8),
+    ("Smith", 23, 5.3),
+     ("Payal", 27, 5.8),
+     ("Megha", 27, 5.4)
+ ]
+ columns = ["Name", "Age", "Height"]
+ df = spark.createDataFrame(data, schema=columns)
+ df.show()
++------+---+------+
+|  Name|Age|Height|
++------+---+------+
+| Smith| 23|   5.3|
+|Rashmi| 27|   5.8|
+| Smith| 23|   5.3|
+| Payal| 27|   5.8|
+| Megha| 27|   5.4|
++------+---+------+
+
+ df_no_duplicates = df.dropDuplicates()
+ df_no_duplicates.show()
++------+---+------+
+|  Name|Age|Height|
++------+---+------+
+| Smith| 23|   5.3|
+|Rashmi| 27|   5.8|
+| Payal| 27|   5.8|
+| Megha| 27|   5.4|
++------+---+------+
+
+df_cleaned = df_no_duplicates.dropDuplicates(['Age', 'Height'])
+df_cleaned.show()
++------+---+------+
+|  Name|Age|Height|
++------+---+------+
+| Smith| 23|   5.3|
+| Megha| 27|   5.4|
+|Rashmi| 27|   5.8|
++------+---+------+
